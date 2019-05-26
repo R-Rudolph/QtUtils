@@ -1,4 +1,4 @@
-#include "QNetworkProxySettings.h"
+#include "qt_utils/QNetworkProxySettings.h"
 
 namespace qt_utils
 {

@@ -1,6 +1,6 @@
-#include <QNetworkProxyWidget.h>
+#include <qt_utils/QNetworkProxyWidget.h>
 #include<iostream>
-#include<private/QNetworkProxyWidgetPrivate.h>
+#include<qt_utils/private/QNetworkProxyWidgetPrivate.h>
 
 namespace qt_utils
 {
@@ -60,7 +60,7 @@ namespace qt_utils
     d->portBox_->setRange(1,65535);
     d->passwordEdit_->setEchoMode(QLineEdit::Password);
 
-    d->credentialsLayout_->addRow("Host Name",d->serverEdit_);
+    d->credentialsLayout_->addRow("Hostname",d->serverEdit_);
     d->credentialsLayout_->addRow("Port",d->portBox_);
     d->credentialsLayout_->addRow("User",d->usernameEdit_);
     d->credentialsLayout_->addRow("Password",d->passwordEdit_);

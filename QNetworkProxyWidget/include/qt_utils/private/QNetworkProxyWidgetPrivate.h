@@ -9,7 +9,7 @@
 #include<QRadioButton>
 #include<QLineEdit>
 #include<QSpinBox>
-#include "QNetworkProxySettings.h"
+#include "qt_utils/QNetworkProxySettings.h"
 
 namespace qt_utils
 {
