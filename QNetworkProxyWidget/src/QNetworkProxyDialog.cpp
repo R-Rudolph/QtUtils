@@ -1,5 +1,6 @@
 #include "qt_utils/QNetworkProxyDialog.h"
 #include "qt_utils/private/QNetworkProxyDialogPrivate.h"
+#include<QJsonObject>
 
 namespace qt_utils
 {
@@ -38,6 +39,16 @@ namespace qt_utils
   QNetworkProxySettings QNetworkProxyDialog::getSettings()
   {
     return d->proxyWidget_->getSettings();
+  }
+
+  QJsonObject QNetworkProxyDialog::toJson() const
+  {
+    return d->proxyWidget_->toJson();
+  }
+
+  bool QNetworkProxyDialog::loadJson(const QJsonObject& data)
+  {
+    return d->proxyWidget_->loadJson(data);
   }
 
   void QNetworkProxyDialog::accept()

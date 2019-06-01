@@ -14,10 +14,6 @@ namespace qt_utils
     Q_OBJECT
     QNetworkProxyWidgetPrivate* d;
 
-    static const QMap<QNetworkProxy::ProxyType, QString> proxyTypeNameMapping_;
-    static const QString proxyTypeNotFoundName_;
-    static const QString& proxyTypeString(QNetworkProxy::ProxyType type);
-
     void addProxyButton(const QString& text, QNetworkProxy::ProxyType type);
     QNetworkProxy::ProxyType currentType() const;
     void checkType(QNetworkProxy::ProxyType type);
@@ -28,6 +24,9 @@ namespace qt_utils
     QNetworkProxySettings getCurrentSettings() const;
     QNetworkProxySettings getSettings() const;
     void setSettings(const QNetworkProxySettings& settings);
+
+    QJsonObject toJson() const;
+    bool loadJson(const QJsonObject& data);
   public slots:
     void reset();
     void save();

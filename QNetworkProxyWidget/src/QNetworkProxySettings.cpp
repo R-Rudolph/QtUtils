@@ -5,6 +5,23 @@
 namespace qt_utils
 {
 
+  const QMap<QNetworkProxy::ProxyType, QString> QNetworkProxySettings::proxyTypeNameMapping_ = {{QNetworkProxy::NoProxy         , "No Proxy"},
+                                                                                                {QNetworkProxy::DefaultProxy    , "Default Proxy"},
+                                                                                                {QNetworkProxy::Socks5Proxy     , "Socks5 Proxy"},
+                                                                                                {QNetworkProxy::HttpProxy       , "HTTP Proxy"},
+                                                                                                {QNetworkProxy::HttpCachingProxy, "HTTP Caching Proxy"},
+                                                                                                {QNetworkProxy::FtpCachingProxy , "FTP Caching Proxy"}};
+
+  const QString QNetworkProxySettings::proxyTypeNotFoundName_ = "<Not found>";
+
+  const QString& QNetworkProxySettings::proxyTypeString(QNetworkProxy::ProxyType type)
+  {
+    if(proxyTypeNameMapping_.contains(type))
+      return proxyTypeNameMapping_.find(type).value();
+    else
+      return proxyTypeNotFoundName_;
+  }
+
   QNetworkProxy::ProxyType QNetworkProxySettings::type() const
   {
     return d->type_;
@@ -82,11 +99,17 @@ namespace qt_utils
 
   bool QNetworkProxySettings::loadJson(const QJsonObject& data)
   {
-    d->user_     = data["username"].toString();
-    d->password_ = data["password"].toString();
-    d->hostname_ = data["hostname"].toString();
-    d->type_     = QNetworkProxy::ProxyType(data["type"    ].toInt());
-    d->port_     = static_cast<quint16>(data["port"].toInt(1));
+    if(!readString(data["username"],d->user_    )) return false;
+    if(!readString(data["password"],d->password_)) return false;
+    if(!readString(data["hostname"],d->hostname_)) return false;
+    int port, type;
+    if(!readInt(data["type"],type)) return false;
+    if(!readInt(data["port"],port)) return false;
+    if(port<1 || port > 65535) return false;
+    if(!proxyTypeNameMapping_.contains(QNetworkProxy::ProxyType(type))) return false;
+    d->type_ = static_cast<QNetworkProxy::ProxyType>(type);
+    d->port_ = static_cast<quint16>(port);
+    return true;
   }
 
   QNetworkProxySettings& QNetworkProxySettings::operator=(const QNetworkProxySettings& other)
@@ -103,6 +126,32 @@ namespace qt_utils
     proxy.setHostName(d->hostname_);
     proxy.setPassword(d->password_);
     proxy.setType(d->type_);
+  }
+
+  bool QNetworkProxySettings::readString(const QJsonValue& value, QString& dest)
+  {
+    if(value.isString())
+    {
+      dest = value.toString();
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  bool QNetworkProxySettings::readInt(const QJsonValue& value, int& dest)
+  {
+    if(value.isDouble())
+    {
+      dest = value.toInt();
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
 
   QNetworkProxySettings::QNetworkProxySettings()

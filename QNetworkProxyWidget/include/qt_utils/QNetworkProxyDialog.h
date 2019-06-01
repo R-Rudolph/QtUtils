@@ -21,6 +21,9 @@ namespace qt_utils
 
     void setSettings(const QNetworkProxySettings& settings);
     QNetworkProxySettings getSettings();
+
+    QJsonObject toJson() const;
+    bool loadJson(const QJsonObject& data);
   signals:
 
   public slots:

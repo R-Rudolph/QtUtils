@@ -1,29 +1,13 @@
 #include <qt_utils/QNetworkProxyWidget.h>
 #include<iostream>
 #include<qt_utils/private/QNetworkProxyWidgetPrivate.h>
+#include<QJsonObject>
 
 namespace qt_utils
 {
   QNetworkProxyWidgetPrivate::QNetworkProxyWidgetPrivate()
   {
 
-  }
-
-  const QMap<QNetworkProxy::ProxyType, QString> QNetworkProxyWidget::proxyTypeNameMapping_ = {{QNetworkProxy::NoProxy         , "No Proxy"},
-                                                                                              {QNetworkProxy::DefaultProxy    , "Default Proxy"},
-                                                                                              {QNetworkProxy::Socks5Proxy     , "Socks5 Proxy"},
-                                                                                              {QNetworkProxy::HttpProxy       , "HTTP Proxy"},
-                                                                                              {QNetworkProxy::HttpCachingProxy, "HTTP Caching Proxy"},
-                                                                                              {QNetworkProxy::FtpCachingProxy , "FTP Caching Proxy"}};
-
-  const QString QNetworkProxyWidget::proxyTypeNotFoundName_ = "<Not found>";
-
-  const QString& QNetworkProxyWidget::proxyTypeString(QNetworkProxy::ProxyType type)
-  {
-    if(proxyTypeNameMapping_.contains(type))
-      return proxyTypeNameMapping_.find(type).value();
-    else
-      return proxyTypeNotFoundName_;
   }
 
   void QNetworkProxyWidget::addProxyButton(const QString& text, QNetworkProxy::ProxyType type)
@@ -75,12 +59,12 @@ namespace qt_utils
     {
       if(!types.contains(proxyType))
       {
-        addProxyButton(proxyTypeString(proxyType),proxyType);
+        addProxyButton(QNetworkProxySettings::proxyTypeString(proxyType),proxyType);
         types.insert(proxyType);
       }
     }
     if(d->proxyButtons_.size()>0)
-      d->proxyButtons_[0].first->click();
+      d->proxyButtons_[0].first->setChecked(true);
   }
 
   QNetworkProxyWidget::~QNetworkProxyWidget()
@@ -109,13 +93,26 @@ namespace qt_utils
     d->backupSettings_ = settings;
   }
 
+  QJsonObject QNetworkProxyWidget::toJson() const
+  {
+    return getSettings().toJson();
+  }
+
+  bool QNetworkProxyWidget::loadJson(const QJsonObject& data)
+  {
+    QNetworkProxySettings settings;
+    if(!settings.loadJson(data)) return false;
+    setSettings(settings);
+    return true;
+  }
+
   void QNetworkProxyWidget::checkType(QNetworkProxy::ProxyType type)
   {
     foreach(auto button, d->proxyButtons_)
     {
       if(button.second == type)
       {
-        button.first->click();
+        button.first->setChecked(true);
         return;
       }
     }
@@ -123,12 +120,12 @@ namespace qt_utils
     {
       if(button.second == QNetworkProxy::DefaultProxy)
       {
-        button.first->click();
+        button.first->setChecked(true);
         return;
       }
     }
     if(d->proxyButtons_.size()>0)
-      d->proxyButtons_[0].first->click();
+      d->proxyButtons_[0].first->setChecked(true);
   }
 
   void QNetworkProxyWidget::reset()

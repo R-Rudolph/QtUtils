@@ -9,6 +9,13 @@ namespace qt_utils
 
   class QNetworkProxySettings
   {
+  public:
+    static const QMap<QNetworkProxy::ProxyType, QString> proxyTypeNameMapping_;
+    static const QString proxyTypeNotFoundName_;
+    static const QString& proxyTypeString(QNetworkProxy::ProxyType type);
+    static bool readString(const QJsonValue& value, QString& dest);
+    static bool readInt(const QJsonValue& value, int& dest);
+  private:
     QNetworkProxySettingsPrivate* d;
   public:
     QNetworkProxySettings();
