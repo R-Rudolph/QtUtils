@@ -5,16 +5,16 @@
 
 namespace qt_utils
 {
+  class QNetworkProxySettingsPrivate;
+
   class QNetworkProxySettings
   {
-    QNetworkProxy::ProxyType type_;
-    QString user_;
-    QString password_;
-    QString hostname_;
-    quint16 port_;
+    QNetworkProxySettingsPrivate* d;
   public:
     QNetworkProxySettings();
     QNetworkProxySettings(QNetworkProxy::ProxyType type, QString user, QString password, QString hostname, quint16 port);
+    QNetworkProxySettings(const QNetworkProxySettings& other);
+    ~QNetworkProxySettings();
     QNetworkProxy::ProxyType type() const;
     void setType(const QNetworkProxy::ProxyType& type);
     QString user() const;
@@ -29,6 +29,11 @@ namespace qt_utils
     void setProxy(QNetworkProxy& proxy) const;
     void setApplicationProxy() const;
     QNetworkProxy toProxy() const;
+
+    QJsonObject toJson() const;
+    bool loadJson(const QJsonObject& data);
+
+    QNetworkProxySettings& operator=(const QNetworkProxySettings& other);
   };
 }
 

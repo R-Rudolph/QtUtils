@@ -1,56 +1,58 @@
 #include "qt_utils/QNetworkProxySettings.h"
+#include "qt_utils/private/QNetworkProxySettingsPrivate.h"
+#include <QJsonObject>
 
 namespace qt_utils
 {
 
   QNetworkProxy::ProxyType QNetworkProxySettings::type() const
   {
-    return type_;
+    return d->type_;
   }
 
   void QNetworkProxySettings::setType(const QNetworkProxy::ProxyType& type)
   {
-    type_ = type;
+    d->type_ = type;
   }
 
   QString QNetworkProxySettings::user() const
   {
-    return user_;
+    return d->user_;
   }
 
   void QNetworkProxySettings::setUser(const QString& user)
   {
-    user_ = user;
+    d->user_ = user;
   }
 
   QString QNetworkProxySettings::password() const
   {
-    return password_;
+    return d->password_;
   }
 
   void QNetworkProxySettings::setPassword(const QString& password)
   {
-    password_ = password;
+    d->password_ = password;
   }
 
   QString QNetworkProxySettings::hostname() const
   {
-    return hostname_;
+    return d->hostname_;
   }
 
   void QNetworkProxySettings::setHostname(const QString& hostname)
   {
-    hostname_ = hostname;
+    d->hostname_ = hostname;
   }
 
   quint16 QNetworkProxySettings::port() const
   {
-    return port_;
+    return d->port_;
   }
 
   void QNetworkProxySettings::setPort(const quint16& port)
   {
-    port_ = port;
+    d->port_ = port;
   }
 
   void QNetworkProxySettings::setApplicationProxy() const
@@ -67,27 +69,65 @@ namespace qt_utils
     return proxy;
   }
 
+  QJsonObject QNetworkProxySettings::toJson() const
+  {
+    QJsonObject data;
+    data.insert("username",d->user_);
+    data.insert("password",d->password_);
+    data.insert("hostname",d->hostname_);
+    data.insert("port",d->port_);
+    data.insert("type",d->type_);
+    return data;
+  }
+
+  bool QNetworkProxySettings::loadJson(const QJsonObject& data)
+  {
+    d->user_     = data["username"].toString();
+    d->password_ = data["password"].toString();
+    d->hostname_ = data["hostname"].toString();
+    d->type_     = QNetworkProxy::ProxyType(data["type"    ].toInt());
+    d->port_     = static_cast<quint16>(data["port"].toInt(1));
+  }
+
+  QNetworkProxySettings& QNetworkProxySettings::operator=(const QNetworkProxySettings& other)
+  {
+    delete d;
+    d = new QNetworkProxySettingsPrivate(*other.d);
+    return *this;
+  }
+
   void QNetworkProxySettings::setProxy(QNetworkProxy& proxy) const
   {
-    proxy.setPort(port_);
-    proxy.setUser(user_);
-    proxy.setHostName(hostname_);
-    proxy.setPassword(password_);
-    proxy.setType(type_);
+    proxy.setPort(d->port_);
+    proxy.setUser(d->user_);
+    proxy.setHostName(d->hostname_);
+    proxy.setPassword(d->password_);
+    proxy.setType(d->type_);
   }
 
   QNetworkProxySettings::QNetworkProxySettings()
   {
-
+    d = new QNetworkProxySettingsPrivate();
   }
 
   QNetworkProxySettings::QNetworkProxySettings(QNetworkProxy::ProxyType type, QString user, QString password, QString hostname, quint16 port)
+    : QNetworkProxySettings()
   {
-    type_     = type;
-    user_     = user;
-    password_ = password;
-    hostname_ = hostname;
-    port_     = port;
+    d->type_     = type;
+    d->user_     = user;
+    d->password_ = password;
+    d->hostname_ = hostname;
+    d->port_     = port;
+  }
+
+  QNetworkProxySettings::QNetworkProxySettings(const QNetworkProxySettings& other)
+  {
+    this->d = new QNetworkProxySettingsPrivate(*other.d);
+  }
+
+  QNetworkProxySettings::~QNetworkProxySettings()
+  {
+    delete d;
   }
 
 }

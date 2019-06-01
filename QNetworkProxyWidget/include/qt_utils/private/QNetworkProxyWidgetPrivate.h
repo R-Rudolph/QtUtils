@@ -21,7 +21,6 @@ namespace qt_utils
     QNetworkProxySettings backupSettings_;
 
     QButtonGroup* radioButtonGroup_;
-    QAbstractSocket* targetSocket_;
 
     QVector<QPair<QRadioButton*,QNetworkProxy::ProxyType>> proxyButtons_;
 
@@ -33,7 +32,6 @@ namespace qt_utils
     QVBoxLayout* mainLayout_;
     QVBoxLayout* proxyButtonLayout_;
     QFormLayout* credentialsLayout_;
-    QDialogButtonBox* buttons_;
   };
 }
 

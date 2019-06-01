@@ -22,15 +22,15 @@ namespace qt_utils
     QNetworkProxy::ProxyType currentType() const;
     void checkType(QNetworkProxy::ProxyType type);
   public:
-    QNetworkProxyWidget(const QList<QNetworkProxy::ProxyType>& availableProxyTypes, QAbstractSocket* targetSocket=nullptr, QWidget* parent=nullptr);
+    QNetworkProxyWidget(const QList<QNetworkProxy::ProxyType>& availableProxyTypes, QWidget* parent=nullptr);
     ~QNetworkProxyWidget();
 
     QNetworkProxySettings getCurrentSettings() const;
     QNetworkProxySettings getSettings() const;
     void setSettings(const QNetworkProxySettings& settings);
   public slots:
-    void accept();
-    void reject();
+    void reset();
+    void save();
   };
 }
 

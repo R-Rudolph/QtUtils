@@ -4,16 +4,17 @@
 
 namespace qt_utils
 {
+  QNetworkProxyWidgetPrivate::QNetworkProxyWidgetPrivate()
+  {
+
+  }
+
   const QMap<QNetworkProxy::ProxyType, QString> QNetworkProxyWidget::proxyTypeNameMapping_ = {{QNetworkProxy::NoProxy         , "No Proxy"},
                                                                                               {QNetworkProxy::DefaultProxy    , "Default Proxy"},
                                                                                               {QNetworkProxy::Socks5Proxy     , "Socks5 Proxy"},
                                                                                               {QNetworkProxy::HttpProxy       , "HTTP Proxy"},
                                                                                               {QNetworkProxy::HttpCachingProxy, "HTTP Caching Proxy"},
                                                                                               {QNetworkProxy::FtpCachingProxy , "FTP Caching Proxy"}};
-  QNetworkProxyWidgetPrivate::QNetworkProxyWidgetPrivate()
-  {
-
-  }
 
   const QString QNetworkProxyWidget::proxyTypeNotFoundName_ = "<Not found>";
 
@@ -43,14 +44,13 @@ namespace qt_utils
     return QNetworkProxy::DefaultProxy;
   }
 
-  QNetworkProxyWidget::QNetworkProxyWidget(const QList<QNetworkProxy::ProxyType>& availableProxyTypes, QAbstractSocket* targetSocket, QWidget* parent)
+  QNetworkProxyWidget::QNetworkProxyWidget(const QList<QNetworkProxy::ProxyType>& availableProxyTypes, QWidget* parent)
     : QWidget(parent),
       d(new QNetworkProxyWidgetPrivate())
   {
     d->mainLayout_        = new QVBoxLayout(this);
     d->proxyButtonLayout_ = new QVBoxLayout();
     d->credentialsLayout_ = new QFormLayout();
-    d->buttons_           = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 
     d->serverEdit_   = new QLineEdit(this);
     d->portBox_      = new QSpinBox(this);
@@ -67,25 +67,25 @@ namespace qt_utils
 
     d->mainLayout_->addLayout(d->proxyButtonLayout_);
     d->mainLayout_->addLayout(d->credentialsLayout_);
-    d->mainLayout_->addWidget(d->buttons_);
 
     d->radioButtonGroup_ = new QButtonGroup(this);
-    d->targetSocket_     = targetSocket;
 
+    QSet<QNetworkProxy::ProxyType> types;
     foreach(QNetworkProxy::ProxyType proxyType, availableProxyTypes)
     {
-      addProxyButton(proxyTypeString(proxyType),proxyType);
+      if(!types.contains(proxyType))
+      {
+        addProxyButton(proxyTypeString(proxyType),proxyType);
+        types.insert(proxyType);
+      }
     }
     if(d->proxyButtons_.size()>0)
       d->proxyButtons_[0].first->click();
-
-    connect(d->buttons_,&QDialogButtonBox::accepted,this,&QNetworkProxyWidget::accept);
-    connect(d->buttons_,&QDialogButtonBox::rejected,this,&QNetworkProxyWidget::reject);
   }
 
   QNetworkProxyWidget::~QNetworkProxyWidget()
   {
-
+    delete d;
   }
 
   QNetworkProxySettings QNetworkProxyWidget::getCurrentSettings() const
@@ -116,6 +116,7 @@ namespace qt_utils
       if(button.second == type)
       {
         button.first->click();
+        return;
       }
     }
     foreach(auto button, d->proxyButtons_)
@@ -123,26 +124,21 @@ namespace qt_utils
       if(button.second == QNetworkProxy::DefaultProxy)
       {
         button.first->click();
+        return;
       }
     }
     if(d->proxyButtons_.size()>0)
       d->proxyButtons_[0].first->click();
   }
 
-  void QNetworkProxyWidget::accept()
-  {
-    setSettings(getCurrentSettings());
-    if(d->targetSocket_)
-      d->targetSocket_->setProxy(d->backupSettings_.toProxy());
-    else
-      d->backupSettings_.setApplicationProxy();
-    close();
-  }
-
-  void QNetworkProxyWidget::reject()
+  void QNetworkProxyWidget::reset()
   {
     setSettings(getSettings());
-    close();
+  }
+
+  void QNetworkProxyWidget::save()
+  {
+    setSettings(getCurrentSettings());
   }
 
 }
