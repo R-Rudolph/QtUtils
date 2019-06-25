@@ -7,6 +7,7 @@ SOURCES += \
     $$PWD/QNetworkProxyWidget/src/QNetworkProxySettings.cpp
 
 HEADERS  += \
+    $$PWD/QNetworkProxyWidget/include/qt_utils/QNetworkProxyDialog \
     $$PWD/QNetworkProxyWidget/include/qt_utils/QNetworkProxyDialog.h \
     $$PWD/QNetworkProxyWidget/include/qt_utils/QNetworkProxyWidget.h \
     $$PWD/QNetworkProxyWidget/include/qt_utils/QNetworkProxyWidget \

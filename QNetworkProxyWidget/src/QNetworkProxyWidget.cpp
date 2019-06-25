@@ -10,12 +10,30 @@ namespace qt_utils
 
   }
 
-  void QNetworkProxyWidget::addProxyButton(const QString& text, QNetworkProxy::ProxyType type)
+  void QNetworkProxyWidget::addProxyButton(QNetworkProxy::ProxyType type)
   {
-    QRadioButton* newProxyButton = new QRadioButton(text,this);
+    const QNetworkProxyProperties& properties = QNetworkProxySettings::proxyTypeProperties(type);
+    QRadioButton* newProxyButton = new QRadioButton(properties.name,this);
     d->proxyButtons_.append(QPair<QRadioButton*,QNetworkProxy::ProxyType>(newProxyButton,type));
     d->proxyButtonLayout_->addWidget(newProxyButton);
     d->radioButtonGroup_->addButton(newProxyButton);
+
+    if(properties.hasHost)
+    {
+      connect(newProxyButton,&QRadioButton::clicked,this,&QNetworkProxyWidget::enableHostFields);
+    }
+    else
+    {
+      connect(newProxyButton,&QRadioButton::clicked,this,&QNetworkProxyWidget::disableHostFields);
+    }
+    if(properties.hasCredentials)
+    {
+      connect(newProxyButton,&QRadioButton::clicked,this,&QNetworkProxyWidget::enableCredentialFields);
+    }
+    else
+    {
+      connect(newProxyButton,&QRadioButton::clicked,this,&QNetworkProxyWidget::disableCredentialFields);
+    }
   }
 
   QNetworkProxy::ProxyType QNetworkProxyWidget::currentType() const
@@ -59,12 +77,12 @@ namespace qt_utils
     {
       if(!types.contains(proxyType))
       {
-        addProxyButton(QNetworkProxySettings::proxyTypeString(proxyType),proxyType);
+        addProxyButton(proxyType);
         types.insert(proxyType);
       }
     }
     if(d->proxyButtons_.size()>0)
-      d->proxyButtons_[0].first->setChecked(true);
+      d->proxyButtons_[0].first->click();
   }
 
   QNetworkProxyWidget::~QNetworkProxyWidget()
@@ -112,7 +130,7 @@ namespace qt_utils
     {
       if(button.second == type)
       {
-        button.first->setChecked(true);
+        button.first->click();
         return;
       }
     }
@@ -120,12 +138,12 @@ namespace qt_utils
     {
       if(button.second == QNetworkProxy::DefaultProxy)
       {
-        button.first->setChecked(true);
+        button.first->click();
         return;
       }
     }
     if(d->proxyButtons_.size()>0)
-      d->proxyButtons_[0].first->setChecked(true);
+      d->proxyButtons_[0].first->click();
   }
 
   void QNetworkProxyWidget::reset()
@@ -136,6 +154,30 @@ namespace qt_utils
   void QNetworkProxyWidget::save()
   {
     setSettings(getCurrentSettings());
+  }
+
+  void QNetworkProxyWidget::enableHostFields()
+  {
+    d->portBox_->setDisabled(false);
+    d->serverEdit_->setDisabled(false);
+  }
+
+  void QNetworkProxyWidget::disableHostFields()
+  {
+    d->portBox_->setDisabled(true);
+    d->serverEdit_->setDisabled(true);
+  }
+
+  void QNetworkProxyWidget::enableCredentialFields()
+  {
+    d->usernameEdit_->setDisabled(false);
+    d->passwordEdit_->setDisabled(false);
+  }
+
+  void QNetworkProxyWidget::disableCredentialFields()
+  {
+    d->usernameEdit_->setDisabled(true);
+    d->passwordEdit_->setDisabled(true);
   }
 
 }

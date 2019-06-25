@@ -14,7 +14,7 @@ namespace qt_utils
     Q_OBJECT
     QNetworkProxyWidgetPrivate* d;
 
-    void addProxyButton(const QString& text, QNetworkProxy::ProxyType type);
+    void addProxyButton(QNetworkProxy::ProxyType type);
     QNetworkProxy::ProxyType currentType() const;
     void checkType(QNetworkProxy::ProxyType type);
   public:
@@ -30,6 +30,11 @@ namespace qt_utils
   public slots:
     void reset();
     void save();
+
+    void enableHostFields();
+    void disableHostFields();
+    void enableCredentialFields();
+    void disableCredentialFields();
   };
 }
 

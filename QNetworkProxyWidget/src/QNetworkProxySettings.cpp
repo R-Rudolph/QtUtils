@@ -5,21 +5,22 @@
 namespace qt_utils
 {
 
-  const QMap<QNetworkProxy::ProxyType, QString> QNetworkProxySettings::proxyTypeNameMapping_ = {{QNetworkProxy::NoProxy         , "No Proxy"},
-                                                                                                {QNetworkProxy::DefaultProxy    , "Default Proxy"},
-                                                                                                {QNetworkProxy::Socks5Proxy     , "Socks5 Proxy"},
-                                                                                                {QNetworkProxy::HttpProxy       , "HTTP Proxy"},
-                                                                                                {QNetworkProxy::HttpCachingProxy, "HTTP Caching Proxy"},
-                                                                                                {QNetworkProxy::FtpCachingProxy , "FTP Caching Proxy"}};
+  const QMap<QNetworkProxy::ProxyType, QNetworkProxyProperties> QNetworkProxySettings::proxyTypePropertyMapping_ =
+           {{QNetworkProxy::NoProxy         , {"No Proxy"          , false, false}},
+            {QNetworkProxy::DefaultProxy    , {"Default Proxy"     , false, false}},
+            {QNetworkProxy::Socks5Proxy     , {"Socks5 Proxy"      , true , true }},
+            {QNetworkProxy::HttpProxy       , {"HTTP Proxy"        , true , true }},
+            {QNetworkProxy::HttpCachingProxy, {"HTTP Caching Proxy", true , false}},
+            {QNetworkProxy::FtpCachingProxy , {"FTP Caching Proxy" , true , false}}};
 
-  const QString QNetworkProxySettings::proxyTypeNotFoundName_ = "<Not found>";
+  const QNetworkProxyProperties QNetworkProxySettings::proxyTypeNotFoundProperty_ = {"<Not found>", false, false};
 
-  const QString& QNetworkProxySettings::proxyTypeString(QNetworkProxy::ProxyType type)
+  const QNetworkProxyProperties& QNetworkProxySettings::proxyTypeProperties(QNetworkProxy::ProxyType type)
   {
-    if(proxyTypeNameMapping_.contains(type))
-      return proxyTypeNameMapping_.find(type).value();
+    if(proxyTypePropertyMapping_.contains(type))
+      return proxyTypePropertyMapping_.find(type).value();
     else
-      return proxyTypeNotFoundName_;
+      return proxyTypeNotFoundProperty_;
   }
 
   QNetworkProxy::ProxyType QNetworkProxySettings::type() const
@@ -106,7 +107,7 @@ namespace qt_utils
     if(!readInt(data["type"],type)) return false;
     if(!readInt(data["port"],port)) return false;
     if(port<1 || port > 65535) return false;
-    if(!proxyTypeNameMapping_.contains(QNetworkProxy::ProxyType(type))) return false;
+    if(!proxyTypePropertyMapping_.contains(QNetworkProxy::ProxyType(type))) return false;
     d->type_ = static_cast<QNetworkProxy::ProxyType>(type);
     d->port_ = static_cast<quint16>(port);
     return true;
